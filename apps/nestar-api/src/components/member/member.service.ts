@@ -14,6 +14,7 @@ import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
 import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow';
+import { lookupAuthMemberLiked } from '../../libs/config';
 
 @Injectable()
 export class MemberService {
@@ -99,9 +100,9 @@ export class MemberService {
 				likeRefId: targetId,
 				likeGroup: LikeGroup.MEMBER,
 			};
-			targetMember.myLiked = await this.likeService.checkLikeExistence(likeInput);
+			targetMember.meLiked = await this.likeService.checkLikeExistence(likeInput);
 
-			targetMember.myFollowed = await this.checkSubscription(memberId, targetId);
+			targetMember.meFollowed = await this.checkSubscription(memberId, targetId);
 		}
 
 		return targetMember;
@@ -126,7 +127,7 @@ export class MemberService {
 				{ $sort: sort },
 				{
 					$facet: {
-						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
+						list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }, lookupAuthMemberLiked(memberId)],
 						metaCounter: [{ $count: 'total' }],
 					},
 				},
@@ -148,7 +149,7 @@ export class MemberService {
 		};
 
 		const modifier: number = await this.likeService.toggleLike(input);
-		9;
+
 		const result = await this.memberStatsEditor({
 			_id: likeRefId,
 			targetKey: 'memberLikes',

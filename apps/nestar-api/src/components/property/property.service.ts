@@ -11,12 +11,13 @@ import { Properties, Property } from '../../libs/dto/property/property';
 import {
 	AgentPropertiesInquiry,
 	AllPropertiesInquiry,
+	OrdinaryInquiry,
 	PropertiesInquiry,
 	PropertyInput,
 } from '../../libs/dto/property/property.input';
 import { PropertyUpdate } from '../../libs/dto/property/property.update';
 import * as moment from 'moment';
-import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
+import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 import { LikeService } from '../like/like.service';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
@@ -80,7 +81,7 @@ export class PropertyService {
 				likeRefId: propertyId,
 				likeGroup: LikeGroup.PROPERTY,
 			};
-			targetProperty.myLiked = await this.likeService.checkLikeExistence(likeInput);
+			targetProperty.meLiked = await this.likeService.checkLikeExistence(likeInput);
 		}
 
 		targetProperty.memberData = await this.memberService.getMember(null, targetProperty.memberId);
@@ -143,7 +144,7 @@ export class PropertyService {
 						list: [
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
-							// meLiked
+							lookupAuthMemberLiked(memberId),
 							lookupMember,
 							{ $unwind: '$memberData' },
 						],
@@ -199,6 +200,14 @@ export class PropertyService {
 				return { [ele]: true };
 			});
 		}
+	}
+
+	public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
+		return await this.likeService.getFavoriteProperties(memberId, input);
+	}
+
+	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
+		return await this.viewService.getVisitedProperties(memberId, input);
 	}
 
 	public async getAgentProperties(memberId: ObjectId, input: AgentPropertiesInquiry): Promise<Properties> {

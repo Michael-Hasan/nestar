@@ -12,6 +12,7 @@ import { Properties, Property } from '../../libs/dto/property/property';
 import {
 	AgentPropertiesInquiry,
 	AllPropertiesInquiry,
+	OrdinaryInquiry,
 	PropertiesInquiry,
 	PropertyInput,
 } from '../../libs/dto/property/property.input';
@@ -66,6 +67,26 @@ export class PropertyResolver {
 	): Promise<Properties> {
 		console.log('Query: getProperties');
 		return await this.propertyService.getProperties(memberId, input);
+	}
+
+	@UseGuards(AuthGuard)
+	@Query(() => Properties)
+	public async getFavorites(
+		@AuthMember('_id') memberId: ObjectId,
+		@Args('input') input: OrdinaryInquiry,
+	): Promise<Properties> {
+		console.log('Query: getFavorites');
+		return await this.propertyService.getFavorites(memberId, input);
+	}
+
+	@UseGuards(AuthGuard)
+	@Query(() => Properties)
+	public async getVisited(
+		@AuthMember('_id') memberId: ObjectId,
+		@Args('input') input: OrdinaryInquiry,
+	): Promise<Properties> {
+		console.log('Query: getVisitedProperties');
+		return await this.propertyService.getVisited(memberId, input);
 	}
 
 	@Roles(MemberType.AGENT)

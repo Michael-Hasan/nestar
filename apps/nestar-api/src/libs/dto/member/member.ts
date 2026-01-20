@@ -86,10 +86,10 @@ export class Member {
 	/** from aggregation **/
 
 	@Field(() => [MeLiked], { nullable: true })
-	myLiked?: MeLiked[];
+	meLiked?: MeLiked[];
 
 	@Field(() => [MeFollowed], { nullable: true })
-	myFollowed?: MeFollowed[];
+	meFollowed?: MeFollowed[];
 }
 
 @ObjectType()
